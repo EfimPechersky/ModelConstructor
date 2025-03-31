@@ -1,0 +1,8 @@
+{
+  "dependencies": [
+    "jsoncpp",
+    "curl",
+    "iostream",
+    "sstream"
+  ]
+}

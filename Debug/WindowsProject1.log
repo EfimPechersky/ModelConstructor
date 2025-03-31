@@ -1,0 +1,3 @@
+﻿  WindowsProject1.cpp
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(278,15): warning C4101: selectedItems: неиспользованная локальная переменная
+  WindowsProject1.vcxproj -> C:\Users\cdtt3\source\repos\WindowsProject1\Debug\WindowsProject1.exe

@@ -1,0 +1,49 @@
+{
+    "elements": [
+        {
+            "desc": "",
+            "name": "2"
+        },
+        {
+            "desc": "",
+            "name": "3"
+        }
+    ],
+    "inputs": [
+        {
+            "name": "1"
+        }
+    ],
+    "name": "1",
+    "outputs": [
+        {
+            "name": "1"
+        }
+    ],
+    "subsystems": [
+        {
+            "desc": "1",
+            "elements": [
+                {
+                    "name": "2"
+                }
+            ],
+            "name": "1"
+        },
+        {
+            "desc": "11",
+            "elements": [
+                {
+                    "name": "3"
+                }
+            ],
+            "name": "11"
+        },
+        {
+            "desc": "11",
+            "first": "1",
+            "name": "11",
+            "second": "11"
+        }
+    ]
+}
