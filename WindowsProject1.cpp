@@ -39,8 +39,8 @@ L"Обратная связь",
 L"Агрегация", 
 L"Обмен данными", 
 L"Поддержка"};
-wchar_t *name;
-wchar_t *path;
+wchar_t *name = nullptr;
+wchar_t *path = nullptr;
 std::vector<std::wstring> inputs;
 std::vector<std::wstring> outputs;
 std::map<std::wstring, std::wstring> elements;
@@ -244,6 +244,39 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - отправить сообщение о выходе и вернуться
 //
 //
+void deleteSubsystem(std::wstring sub) {
+    for (size_t i = 0; i < relations.size(); ) {
+        if (relations[i].firstsys == sub || relations[i].secondsys == sub) {
+            relations.erase(relations.begin() + i);
+        }
+        else {
+            ++i;
+        }
+    }
+    for (size_t i = 0; i < subsystems.size(); ) {
+        if (subsystems[i].name == sub) {
+            // Преобразуем индекс в строку для отображения
+
+            subsystems.erase(subsystems.begin() + i); // Удаляем элемент
+            // Не увеличиваем i, так как следующий элемент сдвинется на место удаленного
+        }
+        else {
+            ++i; // Увеличиваем индекс только если элемент не был удален
+        }
+    }
+}
+void deleteElementFromSubsystems(std::wstring elname) {
+    for (size_t i = 0; i < subsystems.size();) {
+        subsystems[i].elements.erase(std::remove(subsystems[i].elements.begin(), subsystems[i].elements.end(), elname.data()), subsystems[i].elements.end());
+        if (subsystems[i].elements.size() == 0) {
+            deleteSubsystem(subsystems[i].name);
+        }
+        else {
+            ++i;
+        }
+    }
+}
+
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
     return size * nmemb;
@@ -622,19 +655,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     HWND hEdit;
     switch (message)
     {
-    case WM_COMMAND:
-    {
+    //Нажатие кнопок
+    case WM_COMMAND:{
         int wmId = LOWORD(wParam);
         // Разобрать выбор в меню:
         switch (wmId)
         {
-        case IDM_ABOUT:
+        case IDM_ABOUT: {
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+        }
             break;
-        case IDM_EXIT:
+        case IDM_EXIT: {
             DestroyWindow(hWnd);
             break;
-            //Первый Этап
+        }
+        //Первый Этап
         case IDM_OPEN: {
             OPENFILENAME ofn;       // Диалоговое окно выбора файла
             WCHAR szFile[260];      // Здесь будет храниться выбранный файл
@@ -712,10 +747,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     newrel->secondsys = stringToWstring(rel["second"]);
                     relations.push_back(*newrel);
                 }
+                wchar_t* lastSlash = wcsrchr(openfile, L'\\');
+                path = nullptr;
+
+                if (lastSlash != nullptr) {
+                    // Вычисляем длину пути к папке
+                    size_t length = lastSlash - openfile + 1; // +1 для нуль-терминатора
+
+                    // Выделяем память для копии пути к папке
+                    path = (wchar_t*)malloc(length * sizeof(wchar_t));
+                    if (path != nullptr) {
+                        wcsncpy(path, openfile, length - 1); // Копируем путь к папке
+                        path[length - 1] = L'\0'; // Добавляем нуль-терминатор
+                    }
+                }
                 SendMessage(hWnd, WM_COMMAND, IDM_SHOW, IDM_SHOW);
             }
         }break;
-         
         case IDM_SHOW: {
             step = IDM_SHOW;
             RECT clientRect;
@@ -726,16 +774,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EnumChildWindows(hWnd /* parent hwnd*/, DestoryChildCallback, NULL);
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-            Rectangle(hdc, 0, 0, xOffset, height);
+            Rectangle(hdc, 0, 0, xOffset, height-50);
             DrawCenteredText(hdc, L"Входы", xOffset / 2, 10);
             int n = 0;
             for (const std::wstring& inp : inputs) {
                 DrawCenteredText(hdc, inp.c_str(), xOffset / 2, 40 + n * 20);
                 n++;
             }
-            Rectangle(hdc, xOffset, 0, width - xOffset, height);
+            Rectangle(hdc, xOffset, 0, width - xOffset, height-50);
             DrawCenteredText(hdc, L"Система", width / 2, 10);
-            Rectangle(hdc, width - xOffset, 0, width, height);
+            Rectangle(hdc, width - xOffset, 0, width, height-50);
             DrawCenteredText(hdc, L"Выходы", width - xOffset / 2, 10);
             n = 0;
             for (const std::wstring& out : outputs) {
@@ -781,15 +829,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
             }
             EndPaint(hWnd, &ps);
+            HWND hNext = CreateWindow(L"BUTTON", L"Редактировать",
+                WS_VISIBLE | WS_CHILD,
+                xOffset/2, height-40, 120, 30, hWnd, (HMENU)IDM_CREATE, NULL, NULL);
         }break;
-       
         case IDM_NEW: {
-            step = IDM_NEW;
+            path = nullptr;
+            name = nullptr;
             subsystems.clear();
             elements.clear();
             relations.clear();
             inputs.clear();
             outputs.clear();
+            SendMessage(hWnd, WM_COMMAND, IDM_CREATE, IDM_CREATE);
+        }break;
+        case IDM_CREATE: {
+            step = IDM_CREATE;
             EnumChildWindows(hWnd /* parent hwnd*/, DestoryChildCallback, NULL);
             InvalidateRect(hWnd, NULL, TRUE);
             PAINTSTRUCT ps;
@@ -827,24 +882,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HWND testButton = CreateWindow(L"BUTTON", L"Тест нейросети",
                 WS_VISIBLE | WS_CHILD,
                 450, 215, 120, 30, hWnd, (HMENU)99, NULL, NULL);
-            if (sizeof(path) > 0) {
+            if (sizeof(path) > 0 && path != nullptr) {
                 SetWindowText(hEdit, (LPWSTR)path);
             }
-            if (sizeof(name) > 0) {
+            if (sizeof(name) > 0 && name != nullptr) {
                 SetWindowText(hModelName, (LPWSTR)name);
             }
-            break;}
+            break;
+        }
         case 99: {
             CURL* curl;
             CURLcode res;
 
             std::string readBuffer;
-            const char* jsonData = "{\"text\":\"Name 3 countries on Russian Language\"}";
+            const char* jsonData = "{\"text\":\"Describe a beer production facility\"}";
 
             curl_global_init(CURL_GLOBAL_DEFAULT);
             curl = curl_easy_init();
             if (curl) {
-                curl_easy_setopt(curl, CURLOPT_URL, "https://0f64-35-237-152-195.ngrok-free.app/test");
+                curl_easy_setopt(curl, CURLOPT_URL, "https://1c18-34-125-221-240.ngrok-free.app/test");
 
                 struct curl_slist* headers = NULL;
                 headers = curl_slist_append(headers, "Content-Type: application/json");
@@ -891,7 +947,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             name = new wchar_t[256];
             HWND mname = GetDlgItem(hWnd, IDC_MODEL_NAME);
             SendMessage(mname, WM_GETTEXT, sizeof(name), (LPARAM)name);
-            if (*name =='\0' || *path == '\0') {
+            if (name != nullptr && path != nullptr) {
+                if (*name == '\0' || *path == '\0') {
+                    MessageBox(hWnd, L"Заполнены не все поля", L"Ошибка", MB_OK);
+                    break;
+                }
+            }
+            else {
                 MessageBox(hWnd, L"Заполнены не все поля", L"Ошибка", MB_OK);
                 break;
             }
@@ -921,7 +983,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
             HWND hBack = CreateWindow(L"BUTTON", L"Назад",
                 WS_VISIBLE | WS_CHILD,
-                10, 460, 100, 20, hWnd, (HMENU)IDM_NEW, NULL, NULL);
+                10, 460, 100, 20, hWnd, (HMENU)IDM_CREATE, NULL, NULL);
             HWND hNext = CreateWindow(L"BUTTON", L"Далее",
                 WS_VISIBLE | WS_CHILD,
                 230, 460, 100, 20, hWnd, (HMENU)12, NULL, NULL);
@@ -953,6 +1015,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             int index = SendMessage(hInputsList, LB_GETCURSEL, 0, 0);
             if (index != LB_ERR) {
                 SendMessage(hInputsList, LB_DELETESTRING, index, 0);
+                inputs.erase(inputs.begin() + index);
             }
             break;
         }
@@ -960,15 +1023,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case 12:{ 
         HWND hList = GetDlgItem(hWnd, IDC_INPUTS_LIST);
         int count = SendMessage(hList, LB_GETCOUNT, 0, 0);
-        if (count > 0) {
-            inputs.clear();
-            wchar_t inp[256];
-            for (int i = 0; i < count; ++i) { 
-                SendMessage(hList, LB_GETTEXT, i, (LPARAM)inp); // Получаем текст каждого элемента
-                inputs.push_back(inp);
-            }
-        }
-        else if (inputs.size() == 0) {
+        if (inputs.size() == 0) {
             MessageBox(hWnd, L"Не добавлены входы!", L"Ошибка", MB_OK);
             break;
         }
@@ -1031,6 +1086,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             int index = SendMessage(hInputsList, LB_GETCURSEL, 0, 0);
             if (index != LB_ERR) {
                 SendMessage(hInputsList, LB_DELETESTRING, index, 0);
+                outputs.erase(outputs.begin() + index);
             }
             break;
         }
@@ -1038,15 +1094,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case 13: {
             HWND hList = GetDlgItem(hWnd, IDC_OUTPUTS_LIST);
             int count = SendMessage(hList, LB_GETCOUNT, 0, 0);
-            if (count > 0) {
-                outputs.clear();
-                wchar_t out[256];
-                for (int i = 0; i < count; ++i) {
-                    SendMessage(hList, LB_GETTEXT, i, (LPARAM)out); // Получаем текст каждого элемента
-                    outputs.push_back(out);
-                }
-            }
-            else if (outputs.size() == 0) {
+            if (outputs.size() == 0) {
                 MessageBox(hWnd, L"Не добавлены выходы!", L"Ошибка", MB_OK);
                 break;
             }
@@ -1110,8 +1158,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HWND hElementsList = GetDlgItem(hWnd, IDC_ELEMENTS_LIST);
             HWND hDescList = GetDlgItem(hWnd, IDC_DESC_LIST);
             int index = SendMessage(hElementsList, LB_GETCURSEL, 0, 0);
-            char* name = new char[256];
             if (index != LB_ERR) {
+                int length = SendMessage(hElementsList, LB_GETTEXTLEN, index, 0);
+                if (length != LB_ERR) {
+                    // Создаем буфер для текста
+                    std::wstring elname;
+                    // Получаем текст выбранного элемента
+                    SendMessage(hElementsList, LB_GETTEXT, index, (LPARAM)elname.data());
+                    deleteElementFromSubsystems(elname);
+                    
+                }
                 SendMessage(hElementsList, LB_DELETESTRING, index, 0);
                 SendMessage(hDescList, LB_DELETESTRING, index, 0);
             }
@@ -1180,10 +1236,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 500, 460, 100, 20, hWnd, (HMENU)15, NULL, NULL);
             HWND hButtonAddSys = CreateWindow(L"BUTTON", L"Добавить подсистему",
                 WS_VISIBLE | WS_CHILD,
-                20, 265, 120, 30, hWnd, (HMENU)51, NULL, NULL);
+                20, 265, 160, 30, hWnd, (HMENU)51, NULL, NULL);
             HWND hButtonRemoveSys = CreateWindow(L"BUTTON", L"Удалить подсистему",
                 WS_VISIBLE | WS_CHILD,
-                150, 265, 120, 30, hWnd, (HMENU)52, NULL, NULL);
+                190, 265, 160, 30, hWnd, (HMENU)52, NULL, NULL);
             HWND hSysList = CreateWindow(L"LISTBOX", 0,
                 WS_VISIBLE | WS_CHILD | WS_VSCROLL | LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | LBS_NOTIFY,
                 20, 340, 150, 100, hWnd, (HMENU)IDC_SYS_LIST, NULL, NULL);
@@ -1231,8 +1287,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HWND hSysList = GetDlgItem(hWnd, IDC_SYS_LIST);
             int index = SendMessage(hSysList, LB_GETCURSEL, 0, 0);
             if (index != LB_ERR) {
+                // Создаем буфер для текста
+                std::wstring sysname;
+                // Получаем текст выбранного элемента
+                SendMessage(hSysList, LB_GETTEXT, index, (LPARAM)sysname.data());
+                deleteSubsystem(sysname.data());
                 SendMessage(hSysList, LB_DELETESTRING, index, 0);
-                subsystems.erase(subsystems.begin() + index);
             }
             break;
         }
@@ -1270,10 +1330,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 500, 460, 100, 20, hWnd, (HMENU)16, NULL, NULL);
             HWND hButtonAddRel = CreateWindow(L"BUTTON", L"Добавить отношение",
                 WS_VISIBLE | WS_CHILD,
-                20, 265, 120, 30, hWnd, (HMENU)61, NULL, NULL);
+                20, 265, 160, 30, hWnd, (HMENU)61, NULL, NULL);
             HWND hButtonRemoveRel = CreateWindow(L"BUTTON", L"Удалить отношение",
                 WS_VISIBLE | WS_CHILD,
-                150, 265, 120, 30, hWnd, (HMENU)62, NULL, NULL);
+                190, 265, 160, 30, hWnd, (HMENU)62, NULL, NULL);
             HWND hRelList = CreateWindow(L"LISTBOX", 0,
                 WS_VISIBLE | WS_CHILD | WS_VSCROLL | LBS_NOINTEGRALHEIGHT | LBS_DISABLENOSCROLL | LBS_NOTIFY,
                 20, 340, 150, 100, hWnd, (HMENU)IDC_REL_LIST, NULL, NULL);
@@ -1286,6 +1346,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             SetWindowLongPtr(hRelList, GWLP_USERDATA, (LONG_PTR)GetWindowLongPtr(hSysList, GWLP_WNDPROC));
             // Установка нового обработчика
             SetWindowLongPtr(hRelList, GWLP_WNDPROC, (LONG_PTR)ScrollListProc);
+            for (auto it = relations.begin(); it != relations.end(); ++it)
+            {
+                SendMessage(hRelList, LB_ADDSTRING, 0, LPARAM(it->name.data()));
+            }
             break;
         }
         case IDC_REL_LIST: {
@@ -1387,24 +1451,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
        
     }break;
+    //Добавление входа
     case WM_USER + 1:{
         wchar_t* listel = (wchar_t*)lParam;
         HWND hList = GetDlgItem(hWnd, IDC_INPUTS_LIST);
         if (hList != NULL) {
             SendMessage(hList, LB_ADDSTRING, 0, lParam);
+            inputs.push_back(listel);
         }
 
         break;
     }
+    //Добавление выхода
     case WM_USER + 2:{
         wchar_t* listel = (wchar_t*)lParam;
         HWND hList = GetDlgItem(hWnd, IDC_OUTPUTS_LIST);
         if (hList != NULL) {
             SendMessage(hList, LB_ADDSTRING, 0, lParam);
+            outputs.push_back(listel);
         }
 
         break;
     }
+    //Добавление элемента
     case WM_USER + 3:{
         HWND hList = GetDlgItem(hWnd, IDC_ELEMENTS_LIST);
         HWND hDesc = GetDlgItem(hWnd, IDC_DESC_LIST);
@@ -1414,6 +1483,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     }
+     //Добавление подсистемы         
     case WM_USER + 4: {
         HWND hList = GetDlgItem(hWnd, IDC_SYS_LIST);
         Subsystem* newsub = (Subsystem*)lParam;
@@ -1424,6 +1494,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
         
     }
+    //Добавление отношения   
     case WM_USER + 5: {
         HWND hList = GetDlgItem(hWnd, IDC_REL_LIST);
         Relation* newrel = (Relation*)lParam;
@@ -1434,6 +1505,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     }
+    //Изменение размера окна
     case WM_SIZE: {
         if (step == IDM_SHOW && !IsIconic(hWnd)) {
             RECT clientRect;
@@ -1511,7 +1583,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
     }break;
-  
+    //Отрисовка текста
     case WM_PAINT: {
         PAINTSTRUCT ps;
         HDC hdc = BeginPaint(hWnd, &ps);
@@ -1527,7 +1599,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             RECT rect = { 20,60,1000,500 };
             const WCHAR* header = L"Добро пожаловать в Model Construct!";
-            const WCHAR* text = L"Данное приложение представляет собой диалоговую систему поддержки формирования модели предприятия. За основу процесса создания модели системы взята методика Кошарского-Уёмова, базирующаяся на двойственном определении системы.\nПостроение модели разделено на следующие этапы :\n\
+            const WCHAR* text = L"Данное приложение представляет собой диалоговую систему поддержки формирования модели предприятия.\nПостроение модели разделено на следующие этапы :\n\
             \t1.	Создание новой модели\n\
             \t2.	Определение входов системы\n\
             \t3.	Определение выходов системы\n\
@@ -1540,7 +1612,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             SelectObject(hdc, mainFont);
             DrawTextW(hdc, text, -1, &rect, DT_LEFT | DT_VCENTER | DT_WORDBREAK); // Рисуем текст по центру
         }break;
-        case IDM_NEW: {
+        case IDM_CREATE: {
             const WCHAR* header = L"Новая модель";
             const WCHAR* textModelName = L"Название модели";
             const WCHAR* textPath = L"Выберите место для сохранения файла";
@@ -1656,6 +1728,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         
     }
     break;
+    //Закрытие окна
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

@@ -13,6 +13,7 @@
 #define IDI_SMALL				108
 #define IDC_WINDOWSPROJECT1			109
 #define IDM_NEW				1010
+#define IDM_CREATE				1011
 #define IDM_OPEN				1020
 #define IDM_SHOW				1030
 #define IDC_MYICON				2
