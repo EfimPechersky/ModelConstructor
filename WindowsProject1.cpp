@@ -14,7 +14,6 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
-
 #define MAX_LOADSTRING 100
 
 
@@ -895,12 +894,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             CURLcode res;
 
             std::string readBuffer;
-            const char* jsonData = "{\"text\":\"Describe a beer production facility\"}";
+            const char* jsonData = "{\"text\":\"Describe a beer production facility in 3 sentences\"}";
 
             curl_global_init(CURL_GLOBAL_DEFAULT);
             curl = curl_easy_init();
             if (curl) {
-                curl_easy_setopt(curl, CURLOPT_URL, "https://1c18-34-125-221-240.ngrok-free.app/test");
+                curl_easy_setopt(curl, CURLOPT_URL, "https://2b46-34-125-78-159.ngrok-free.app/test");
 
                 struct curl_slist* headers = NULL;
                 headers = curl_slist_append(headers, "Content-Type: application/json");
@@ -944,9 +943,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         //Второй Этап
         case 11:{
             step = 11;
-            name = new wchar_t[256];
+            int namesize = 256;
+            name = new wchar_t[namesize];
             HWND mname = GetDlgItem(hWnd, IDC_MODEL_NAME);
-            SendMessage(mname, WM_GETTEXT, sizeof(name), (LPARAM)name);
+            SendMessage(mname, WM_GETTEXT, namesize, (LPARAM)name);
             if (name != nullptr && path != nullptr) {
                 if (*name == '\0' || *path == '\0') {
                     MessageBox(hWnd, L"Заполнены не все поля", L"Ошибка", MB_OK);
@@ -1434,7 +1434,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             std::string jsonString = j.dump(4); // 4 - это количество пробелов для отступов
 
             std::wstring truepath = (path + std::wstring(L"\\") + name + std::wstring(L".json"));
-            MessageBox(NULL, LPCWSTR(truepath.data()), L"test", MB_OK);
             // Записываем JSON в файл
             std::ofstream outFile(truepath.data());
             if (outFile.is_open()) {

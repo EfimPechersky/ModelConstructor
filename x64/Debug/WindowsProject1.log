@@ -15,20 +15,20 @@ C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(607,31): warning
 C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(620,32): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
 C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(621,32): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
 C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(826,1): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1015,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1025,19): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1086,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1096,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1160,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1162,28): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1181,27): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1196,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1266,27): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1270,31): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1288,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1360,27): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1364,31): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1380,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1562,1): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1573,1): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1016,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1026,19): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1087,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1097,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1161,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1163,28): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1182,27): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1197,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1267,27): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1271,31): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1289,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1361,27): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1365,31): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1381,23): warning C4244: инициализация: преобразование "LRESULT" в "int", возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1568,1): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\cdtt3\source\repos\WindowsProject1\WindowsProject1.cpp(1579,1): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
   WindowsProject1.vcxproj -> C:\Users\cdtt3\source\repos\WindowsProject1\x64\Debug\WindowsProject1.exe
